@@ -13,6 +13,12 @@ Turn plain-English questions into a single, ready-to-run shell command with a sh
 
 There are prebuilt, stable releases available [here](https://github.com/coalaura/idk/releases). Alternatively you can also build idk from source.
 
+You can bootstrap **idk** with a single command. This script will detect your OS and CPU (`amd64`/`arm64`), download the correct binary and install it to `/usr/local/bin/idk`.
+
+```bash
+curl -sL https://src.w2k.sh/idk/install.sh | sh
+```
+
 ## Configure
 
 On first run, idk creates a config at `~/.idk.yml` with defaults and exits so you can add your API key.
