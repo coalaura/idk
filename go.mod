@@ -3,7 +3,7 @@ module idk
 go 1.24.5
 
 require (
-	github.com/coalaura/getch v0.0.2
+	github.com/coalaura/getch v0.0.3
 	github.com/goccy/go-yaml v1.18.0
 	github.com/revrost/go-openrouter v0.2.1
 	github.com/shirou/gopsutil/v4 v4.25.7
