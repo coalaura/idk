@@ -10,8 +10,9 @@ import (
 
 type Config struct {
 	OpenRouter struct {
-		ApiKey string `json:"api_key"`
-		Model  string `json:"model"`
+		ApiKey    string   `json:"api_key"`
+		Model     string   `json:"model"`
+		Providers []string `json:"providers"`
 	} `json:"openrouter"`
 	Commands struct {
 		AskToRun bool `json:"ask_to_run"`
@@ -28,7 +29,8 @@ func loadConfig() (*Config, error) {
 
 	// defaults
 	config.OpenRouter.ApiKey = "your-api-key"
-	config.OpenRouter.Model = "openai/gpt-5-chat"
+	config.OpenRouter.Model = "inception/mercury-2"
+	config.OpenRouter.Providers = []string{"inception"}
 	config.Commands.AskToRun = true
 
 	// ~/.idk.yml

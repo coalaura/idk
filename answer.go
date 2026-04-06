@@ -45,12 +45,20 @@ func answer(config *Config, question string) (*exec.Cmd, string, error) {
 		Stream: true,
 	}
 
+	if len(config.OpenRouter.Providers) > 0 {
+		request.Provider = &openrouter.ChatProvider{
+			Only:  config.OpenRouter.Providers,
+			Order: config.OpenRouter.Providers,
+		}
+	}
+
 	stream, err := client.CreateChatCompletionStream(context.Background(), request)
 	if err != nil {
 		return nil, "", err
 	}
 
 	defer stream.Close()
+
 	defer fmt.Println()
 
 	var response strings.Builder
