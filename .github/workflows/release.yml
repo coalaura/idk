@@ -20,12 +20,12 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Set up Go
-      uses: actions/setup-go@v5
+      uses: actions/setup-go@v6
       with:
-        go-version: '1.24.6'
+        go-version-file: go.mod
 
     - name: Build ${{ matrix.goos }}_${{ matrix.goarch }}
       shell: bash
@@ -44,7 +44,7 @@ jobs:
           -o "$OUT" .
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: idk_${{ github.ref_name }}_${{ matrix.goos }}_${{ matrix.goarch }}
         path: build/*
@@ -54,10 +54,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Download all build artifacts
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v8
       with:
         path: ./build
 
