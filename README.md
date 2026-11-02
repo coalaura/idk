@@ -16,23 +16,28 @@ There are prebuilt, stable releases available [here](https://github.com/coalaura
 You can bootstrap **idk** with a single command. This script will detect your OS and CPU (`amd64`/`arm64`), download the correct binary and install it to `/usr/local/bin/idk`.
 
 ```bash
-curl -sL https://src.w2k.sh/idk/install.sh | sh
+curl -sL https://src.ws2.sh/idk/install.sh | sh
 ```
 
 ## Configure
 
-On first run, idk creates a config at `~/.idk.yml` with defaults and exits so you can add your API key.
+On first run, idk creates a config at `~/.config/idk.yml` with defaults and exits so you can add your API key.
 
 ```yaml
 openrouter:
   api_key: your-api-key
-  model: openai/gpt-5-chat
+  model: inception/mercury-3
+  fallbacks:
+    - google/gemini-3.8-flash
+  providers: []
 commands:
   ask_to_run: true
 ```
 
 - `openrouter.api_key`: your OpenRouter API key
-- `openrouter.model`: model slug (e.g. `openai/gpt-5-chat`)
+- `openrouter.model`: model slug (e.g. `inception/mercury-3`)
+- `openrouter.fallbacks`: optional model slugs in fallback order. OpenRouter receives the primary model followed by this list and handles fallback routing natively. Omit it or use `[]` to disable model fallbacks.
+- `openrouter.providers`: allowed providers, in preference order, for all models including fallbacks. The generated config defaults to `[inception]`; set this to `[]` to allow any provider when using models from other providers.
 - `commands.ask_to_run`: if true, idk prompts to execute commands
 
 ## Usage
@@ -59,5 +64,5 @@ Press `y` to execute in your current shell (Windows uses `/C`, others use `-c`).
 
 ## Build from source
 
-- Requirements: Go 1.24+
+- Requirements: Go 1.26.5+
 - Build: `go build -o idk` (Windows will produce `idk.exe`)

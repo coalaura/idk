@@ -9,14 +9,19 @@ import (
 )
 
 type Config struct {
-	OpenRouter struct {
-		ApiKey    string   `json:"api_key"`
-		Model     string   `json:"model"`
-		Providers []string `json:"providers"`
-	} `json:"openrouter"`
-	Commands struct {
-		AskToRun bool `json:"ask_to_run"`
-	} `json:"commands"`
+	OpenRouter OpenRouterConfig `json:"openrouter"`
+	Commands   CommandsConfig   `json:"commands"`
+}
+
+type OpenRouterConfig struct {
+	ApiKey    string   `json:"api_key"`
+	Model     string   `json:"model"`
+	Fallbacks []string `json:"fallbacks"`
+	Providers []string `json:"providers"`
+}
+
+type CommandsConfig struct {
+	AskToRun bool `json:"ask_to_run"`
 }
 
 func loadConfig() (*Config, error) {

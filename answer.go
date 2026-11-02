@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	_ "embed"
+	"errors"
 	"fmt"
 	"io"
 	"os/exec"
@@ -11,7 +12,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/revrost/go-openrouter"
+	"github.com/coalaura/openingrouter"
 )
 
 var (
@@ -27,7 +28,7 @@ func answer(config *Config, question string) (*exec.Cmd, string, error) {
 
 	available := availableCommands()
 
-	client := openrouter.NewClient(config.OpenRouter.ApiKey)
+	client := openingrouter.NewClient(config.OpenRouter.ApiKey)
 
 	prompt := fmt.Sprintf(
 		Prompt,
@@ -36,17 +37,24 @@ func answer(config *Config, question string) (*exec.Cmd, string, error) {
 		available,
 	)
 
-	request := openrouter.ChatCompletionRequest{
+	request := openingrouter.ChatCompletionRequest{
 		Model: config.OpenRouter.Model,
-		Messages: []openrouter.ChatCompletionMessage{
-			openrouter.SystemMessage(prompt),
-			openrouter.UserMessage(question),
+		Messages: []openingrouter.ChatMessage{
+			openingrouter.SystemMessage(prompt),
+			openingrouter.UserMessage(question),
 		},
-		Stream: true,
+	}
+
+	if len(config.OpenRouter.Fallbacks) > 0 {
+		request.Model = ""
+
+		request.Models = make([]string, 0, 1+len(config.OpenRouter.Fallbacks))
+		request.Models = append(request.Models, config.OpenRouter.Model)
+		request.Models = append(request.Models, config.OpenRouter.Fallbacks...)
 	}
 
 	if len(config.OpenRouter.Providers) > 0 {
-		request.Provider = &openrouter.ChatProvider{
+		request.Provider = &openingrouter.ProviderPreferences{
 			Only:  config.OpenRouter.Providers,
 			Order: config.OpenRouter.Providers,
 		}
@@ -66,11 +74,15 @@ func answer(config *Config, question string) (*exec.Cmd, string, error) {
 	for {
 		chunk, err := stream.Recv()
 		if err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				break
 			}
 
 			return nil, "", err
+		}
+
+		if len(chunk.Choices) == 0 {
+			continue
 		}
 
 		delta := chunk.Choices[0].Delta.Content

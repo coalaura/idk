@@ -33,7 +33,8 @@ func availableCommands() []string {
 	available := make([]string, 0, len(check))
 
 	for _, command := range check {
-		if _, err := exec.LookPath(command); err != nil {
+		_, err := exec.LookPath(command)
+		if err != nil {
 			continue
 		}
 
