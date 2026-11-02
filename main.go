@@ -8,11 +8,19 @@ import (
 	"github.com/coalaura/getch"
 )
 
+var version = "dev"
+
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Println("Usage: idk <question>")
 
 		os.Exit(1)
+	}
+
+	if os.Args[1] == "version" {
+		fmt.Printf("idk version %s\n", version)
+
+		return
 	}
 
 	config, err := loadConfig()
