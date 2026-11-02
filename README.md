@@ -26,18 +26,19 @@ On first run, idk creates a config at `~/.config/idk.yml` with defaults and exit
 ```yaml
 openrouter:
   api_key: your-api-key
-  model: inception/mercury-3
+  model: google/gemini-3.5-flash-lite
   fallbacks:
     - google/gemini-3.8-flash
-  providers: []
+  providers:
+  - google-vertex/global
 commands:
   ask_to_run: true
 ```
 
 - `openrouter.api_key`: your OpenRouter API key
-- `openrouter.model`: model slug (e.g. `inception/mercury-3`)
+- `openrouter.model`: model slug (defaults to `google/gemini-3.5-flash-lite`)
 - `openrouter.fallbacks`: optional model slugs in fallback order. OpenRouter receives the primary model followed by this list and handles fallback routing natively. Omit it or use `[]` to disable model fallbacks.
-- `openrouter.providers`: allowed providers, in preference order, for all models including fallbacks. The generated config defaults to `[inception]`; set this to `[]` to allow any provider when using models from other providers.
+- `openrouter.providers`: allowed providers, in preference order, for all models including fallbacks. The generated config defaults to `[google-vertex/global]`; set this to `[]` to allow any provider when using models from other providers.
 - `commands.ask_to_run`: if true, idk prompts to execute commands
 
 ## Usage

@@ -34,8 +34,8 @@ func loadConfig() (*Config, error) {
 
 	// defaults
 	config.OpenRouter.ApiKey = "your-api-key"
-	config.OpenRouter.Model = "inception/mercury-3"
-	config.OpenRouter.Providers = []string{"inception"}
+	config.OpenRouter.Model = "google/gemini-3.5-flash-lite"
+	config.OpenRouter.Providers = []string{"google-vertex/global"}
 	config.Commands.AskToRun = true
 
 	// ~/.config/idk.yml
