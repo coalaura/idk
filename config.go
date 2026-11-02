@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/coalaura/openingrouter"
 	"github.com/goccy/go-yaml"
 )
 
@@ -14,10 +15,11 @@ type Config struct {
 }
 
 type OpenRouterConfig struct {
-	ApiKey    string   `json:"api_key"`
-	Model     string   `json:"model"`
-	Fallbacks []string `json:"fallbacks"`
-	Providers []string `json:"providers"`
+	ApiKey          string                        `json:"api_key"`
+	Model           string                        `json:"model"`
+	ReasoningEffort openingrouter.ReasoningEffort `json:"reasoning_effort"`
+	Fallbacks       []string                      `json:"fallbacks"`
+	Providers       []string                      `json:"providers"`
 }
 
 type CommandsConfig struct {
@@ -35,6 +37,7 @@ func loadConfig() (*Config, error) {
 	// defaults
 	config.OpenRouter.ApiKey = "your-api-key"
 	config.OpenRouter.Model = "google/gemini-3.5-flash-lite"
+	config.OpenRouter.ReasoningEffort = openingrouter.ReasoningEffortNone
 	config.OpenRouter.Providers = []string{"google-vertex/global"}
 	config.Commands.AskToRun = true
 

@@ -27,6 +27,7 @@ On first run, idk creates a config at `~/.config/idk.yml` with defaults and exit
 openrouter:
   api_key: your-api-key
   model: google/gemini-3.5-flash-lite
+  reasoning_effort: none
   fallbacks:
     - google/gemini-3.8-flash
   providers:
@@ -37,6 +38,7 @@ commands:
 
 - `openrouter.api_key`: your OpenRouter API key
 - `openrouter.model`: model slug (defaults to `google/gemini-3.5-flash-lite`). Models and providers, including fallbacks, must support structured outputs (`json_schema`).
+- `openrouter.reasoning_effort`: reasoning effort, defaulting to `none` even when omitted from an existing config. Values: `none`, `minimal`, `low`, `medium`, `high`, `xhigh`, `max`; supported levels depend on the model/provider.
 - `openrouter.fallbacks`: optional model slugs in fallback order. OpenRouter receives the primary model followed by this list and handles fallback routing natively. Omit it or use `[]` to disable model fallbacks.
 - `openrouter.providers`: allowed providers, in preference order, for all models including fallbacks. The generated config defaults to `[google-vertex/global]`; set this to `[]` to allow any provider when using models from other providers.
 - `commands.ask_to_run`: if true, idk prompts to execute commands

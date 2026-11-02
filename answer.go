@@ -37,6 +37,9 @@ func answer(config *Config, question string) (*exec.Cmd, string, error) {
 			openingrouter.UserMessage(question),
 		},
 		ResponseFormat: &answerResponseFormat,
+		Reasoning: &openingrouter.ChatReasoningConfig{
+			Effort: config.OpenRouter.ReasoningEffort,
+		},
 		Provider: &openingrouter.ProviderPreferences{
 			Only:              config.OpenRouter.Providers,
 			Order:             config.OpenRouter.Providers,
