@@ -1,6 +1,6 @@
 # idk
 
-![screenshot](.github/screenshot.png)
+![Terminal demo: idk finds the process using port 4096](.github/terminal.svg)
 
 Turn plain-English questions into a single, ready-to-run shell command with a short explanation. idk streams the suggestion, detects your OS/shell and common tools, and (optionally) asks if you want to execute the command.
 

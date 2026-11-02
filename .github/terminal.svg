@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="328" viewBox="0 0 1100 328" role="img" aria-labelledby="title description">
+	<title id="title">Find the process using port 4096 with idk</title>
+	<desc id="description">A terminal session showing idk suggesting netstat -ano piped to findstr :4096. After confirmation, the output shows PID 18288 listening on port 4096 and an established local connection.</desc>
+	<rect width="1100" height="328" fill="#10141c"/>
+	<g font-family="'Cascadia Code', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace" font-size="16" fill="#e4e9f0">
+		<text x="32" y="52"><tspan fill="#79c0ff" font-weight="600">idk</tspan> what process is using port 4096</text>
+		<text x="32" y="96"><tspan fill="#7ee2b8">$</tspan> netstat -ano <tspan fill="#8b98ab">|</tspan> findstr :4096</text>
+		<g fill="#a4afbf">
+			<text x="51.2" y="124">Uses netstat to display active network connections and listening ports,</text>
+			<text x="51.2" y="148">filtering for port 4096 to find the associated PID.</text>
+		</g>
+		<text x="32" y="198"><tspan fill="#79c0ff">&gt;</tspan> run command? <tspan fill="#a4afbf">[y/n]:</tspan> <tspan fill="#7ee2b8">yes</tspan></text>
+		<g fill="#c5cedb">
+			<text y="238"><tspan x="51.2">TCP</tspan> <tspan x="118.4">127.0.0.1:4096</tspan> <tspan x="339.2">0.0.0.0:0</tspan> <tspan x="560">LISTENING</tspan> <tspan x="713.6">18288</tspan></text>
+			<text y="262"><tspan x="51.2">TCP</tspan> <tspan x="118.4">127.0.0.1:4096</tspan> <tspan x="339.2">127.0.0.1:49433</tspan> <tspan x="560">ESTABLISHED</tspan> <tspan x="713.6">18288</tspan></text>
+			<text y="286"><tspan x="51.2">TCP</tspan> <tspan x="118.4">127.0.0.1:49433</tspan> <tspan x="339.2">127.0.0.1:4096</tspan> <tspan x="560">ESTABLISHED</tspan> <tspan x="713.6">18288</tspan></text>
+		</g>
+	</g>
+</svg>
