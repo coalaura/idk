@@ -2,7 +2,7 @@
 
 ![Terminal demo: idk finds the process using port 4096](.github/terminal.svg)
 
-Turn plain-English questions into a single, ready-to-run shell command with a short explanation. idk streams the suggestion, detects your OS/shell and common tools, and (optionally) asks if you want to execute the command.
+Turn plain-English questions into a single, ready-to-run shell command with a short explanation. idk detects your OS/shell and common tools, renders a structured response and (optionally) asks if you want to execute the command.
 
 - Powered by OpenRouter chat completions
 - Detects parent shell automatically (Windows/macOS/Linux)
@@ -36,7 +36,7 @@ commands:
 ```
 
 - `openrouter.api_key`: your OpenRouter API key
-- `openrouter.model`: model slug (defaults to `google/gemini-3.5-flash-lite`)
+- `openrouter.model`: model slug (defaults to `google/gemini-3.5-flash-lite`). Models and providers, including fallbacks, must support structured outputs (`json_schema`).
 - `openrouter.fallbacks`: optional model slugs in fallback order. OpenRouter receives the primary model followed by this list and handles fallback routing natively. Omit it or use `[]` to disable model fallbacks.
 - `openrouter.providers`: allowed providers, in preference order, for all models including fallbacks. The generated config defaults to `[google-vertex/global]`; set this to `[]` to allow any provider when using models from other providers.
 - `commands.ask_to_run`: if true, idk prompts to execute commands
@@ -48,7 +48,7 @@ commands:
 idk list the largest files in this directory
 ```
 
-idk will stream a response like:
+idk will display a response like:
 
 ```
 $ du -sh * | sort -h

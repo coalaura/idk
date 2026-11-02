@@ -3,12 +3,10 @@ package main
 import (
 	"context"
 	_ "embed"
-	"errors"
 	"fmt"
-	"io"
+	"os"
 	"os/exec"
 	"path/filepath"
-	"regexp"
 	"runtime"
 	"strings"
 
@@ -30,18 +28,19 @@ func answer(config *Config, question string) (*exec.Cmd, string, error) {
 
 	client := openingrouter.NewClient(config.OpenRouter.ApiKey)
 
-	prompt := fmt.Sprintf(
-		Prompt,
-		runtime.GOOS,
-		filepath.Base(shell),
-		available,
-	)
+	prompt := fmt.Sprintf(Prompt, runtime.GOOS, filepath.Base(shell), strings.Join(available, ","))
 
 	request := openingrouter.ChatCompletionRequest{
 		Model: config.OpenRouter.Model,
 		Messages: []openingrouter.ChatMessage{
 			openingrouter.SystemMessage(prompt),
 			openingrouter.UserMessage(question),
+		},
+		ResponseFormat: &answerResponseFormat,
+		Provider: &openingrouter.ProviderPreferences{
+			Only:              config.OpenRouter.Providers,
+			Order:             config.OpenRouter.Providers,
+			RequireParameters: new(true),
 		},
 	}
 
@@ -53,51 +52,20 @@ func answer(config *Config, question string) (*exec.Cmd, string, error) {
 		request.Models = append(request.Models, config.OpenRouter.Fallbacks...)
 	}
 
-	if len(config.OpenRouter.Providers) > 0 {
-		request.Provider = &openingrouter.ProviderPreferences{
-			Only:  config.OpenRouter.Providers,
-			Order: config.OpenRouter.Providers,
-		}
-	}
-
-	stream, err := client.CreateChatCompletionStream(context.Background(), request)
+	response, err := client.CreateChatCompletion(context.Background(), request)
 	if err != nil {
 		return nil, "", err
 	}
 
-	defer stream.Close()
-
-	defer fmt.Println()
-
-	var response strings.Builder
-
-	for {
-		chunk, err := stream.Recv()
-		if err != nil {
-			if errors.Is(err, io.EOF) {
-				break
-			}
-
-			return nil, "", err
-		}
-
-		if len(chunk.Choices) == 0 {
-			continue
-		}
-
-		delta := chunk.Choices[0].Delta.Content
-
-		if delta != "" {
-			response.WriteString(delta)
-
-			fmt.Print(delta)
-		}
+	result, err := parseAnswer(response)
+	if err != nil {
+		return nil, "", err
 	}
 
-	rgx := regexp.MustCompile(`(?m)^\$(.+?)$`)
-	command := rgx.FindString(response.String())
-
-	command = strings.Trim(command, "$ \r\n")
+	err = result.render(os.Stdout)
+	if err != nil {
+		return nil, "", err
+	}
 
 	var flag string
 
@@ -107,5 +75,5 @@ func answer(config *Config, question string) (*exec.Cmd, string, error) {
 		flag = "-c"
 	}
 
-	return exec.Command(shell, flag, command), command, nil
+	return exec.Command(shell, flag, result.Command), result.Command, nil
 }
