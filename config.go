@@ -29,7 +29,7 @@ func loadConfig() (*Config, error) {
 
 	// defaults
 	config.OpenRouter.ApiKey = "your-api-key"
-	config.OpenRouter.Model = "inception/mercury-2"
+	config.OpenRouter.Model = "inception/mercury-3"
 	config.OpenRouter.Providers = []string{"inception"}
 	config.Commands.AskToRun = true
 
