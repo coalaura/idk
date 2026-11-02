@@ -33,8 +33,14 @@ func loadConfig() (*Config, error) {
 	config.OpenRouter.Providers = []string{"inception"}
 	config.Commands.AskToRun = true
 
-	// ~/.idk.yml
-	path := filepath.Join(home, ".idk.yml")
+	// ~/.config/idk.yml
+	path := filepath.Join(home, ".config", "idk.yml")
+	dir := filepath.Dir(path)
+
+	_, err = os.Stat(dir)
+	if os.IsNotExist(err) {
+		os.MkdirAll(dir, 0755)
+	}
 
 	file, err := os.OpenFile(path, os.O_RDONLY, 0)
 	if err != nil {
