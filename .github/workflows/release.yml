@@ -6,65 +6,91 @@ on:
       - 'v*'
 
 permissions:
-  contents: write
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     strategy:
-      matrix:
-        goos:   [windows, linux, darwin]
-        goarch: [amd64, arm64]
       fail-fast: false
+      matrix:
+        goos: [windows, linux, darwin]
+        goarch: [amd64, arm64]
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
 
-    - name: Set up Go
-      uses: actions/setup-go@v6
+    - name: Build
+      id: build
+      uses: coalaura/build@v1
       with:
-        go-version-file: go.mod
+        os: ${{ matrix.goos }}
+        arch: ${{ matrix.goarch }}
+        optimization: compatible
+        generate: false
+        output: dist/idk_${{ github.ref_name }}_${{ matrix.goos }}_${{ matrix.goarch }}${{ matrix.goos == 'windows' && '.exe' || '' }}
+        go-flags: |
+          -ldflags=-X main.version=${{ github.ref_name }}
 
-    - name: Build ${{ matrix.goos }}_${{ matrix.goarch }}
-      shell: bash
-      run: |
-        mkdir -p build
-        [[ "${{ matrix.goos }}" == "windows" ]] && EXT=".exe" || EXT=""
-
-        OUT="build/idk_${{ github.ref_name }}_${{ matrix.goos }}_${{ matrix.goarch }}${EXT}"
-
-        GOOS=${{ matrix.goos }} \
-        GOARCH=${{ matrix.goarch }} \
-        CGO_ENABLED=0 \
-        go build \
-          -trimpath \
-          -buildvcs=false \
-          -o "$OUT" .
-
-    - name: Upload artifact
-      uses: actions/upload-artifact@v6
+    - name: Sign
+      id: sign
+      uses: coalaura/sign@v1
       with:
-        name: idk_${{ github.ref_name }}_${{ matrix.goos }}_${{ matrix.goarch }}
-        path: build/*
+        path: ${{ steps.build.outputs.path }}
+        key: ${{ secrets.COALAURA_PFX }}
+        passphrase: ${{ secrets.COALAURA_PFX_PASSWORD }}
+        chain: |
+          https://wiese2.org/pki/issuing.pem
+          https://wiese2.org/pki/root.pem
+
+    - name: Upload signed binary
+      uses: actions/upload-artifact@v7
+      with:
+        name: signed-idk-${{ matrix.goos }}-${{ matrix.goarch }}
+        path: ${{ steps.sign.outputs.path }}
+        if-no-files-found: error
 
   release:
     needs: build
     runs-on: ubuntu-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v6
 
-    - name: Download all build artifacts
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+      artifact-metadata: write
+
+    steps:
+    - name: Download signed binaries
       uses: actions/download-artifact@v8
       with:
-        path: ./build
+        pattern: signed-idk-*
+        merge-multiple: true
+        path: dist
+
+    - name: Generate checksums
+      working-directory: dist
+      run: sha256sum -b idk_* > SHA256SUMS
+
+    - name: Attest signed binaries
+      uses: actions/attest@v4
+      with:
+        subject-checksums: dist/SHA256SUMS
 
     - name: Create GitHub release
-      uses: softprops/action-gh-release@v2
+      uses: softprops/action-gh-release@v3
       with:
-        files: ./build/**
+        files: |
+          dist/idk_*
+          dist/SHA256SUMS
+        fail_on_unmatched_files: true
+        generate_release_notes: true
+        prerelease: ${{ contains(github.ref_name, '-') }}
         name: "Release ${{ github.ref_name }}"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.GITHUB_TOKEN }}
